@@ -1,0 +1,3 @@
+# The compiled tool. `go build` leaves it in the work tree and `git add -A`
+# takes it; landingdiff shipped one that way in its first commit.
+/fleetfind
