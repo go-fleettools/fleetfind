@@ -15,6 +15,12 @@ go-richdoc/markdown                Markdown (CommonMark + GFM) <-> richdoc conve
 3 of 2023 repositories, inventory of 2026-10-08
 ```
 
+## Install
+
+```sh
+go install github.com/go-fleettools/fleetfind@latest
+```
+
 ## Why
 
 The fleet keeps a capability map by hand, and it says of itself, in bold, that
