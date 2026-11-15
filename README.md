@@ -3,7 +3,8 @@
 **Which repository already does this?**
 
 ```
-fleetfind -refresh             # ~335 calls, one dated inventory
+fleetfind -refresh             # ~377 gh calls: one dated inventory, then the file/function index
+fleetfind -index               # only the index, from the module proxy: 0 GitHub calls
 fleetfind odf rtf markdown
 ```
 
@@ -14,6 +15,43 @@ go-richdoc/markdown                Markdown (CommonMark + GFM) <-> richdoc conve
 
 3 of 2023 repositories, inventory of 2026-10-08
 ```
+
+## Files and functions, not only domains
+
+A repository's name and description name its *domain* ("descriptive
+statistics"), never its functions, so `fleetfind quantile` used to print
+`nothing in 2253 repositories` while `go-statistics/stats` has `quantile.go`
+(go-fleettools/fleettools#306). The index adds the root and nested **file
+names** and the **exported top-level identifiers** (functions, methods, types,
+constants, variables; `go/parser`, no type checking, test files and `testdata`
+excluded) of every repository that is a Go module:
+
+```
+$ fleetfind quantile
+go-statistics/stats   Probability distributions, descriptive statistics and tests in pure Go …
+go-statistics/stats   file:quantile.go
+go-statistics/stats   ident:Quantile
+go-statistics/stats   ident:QuantileAveragedInvertedCDF
+```
+
+- **No GitHub budget.** The source is the Go module proxy (`@latest`, then the
+  module zip at github.com/org/repo), so `fleetfind -index` makes **0 GitHub
+  calls**. `-refresh` still lists organisations (~377 `gh` calls, ~1000 REST
+  requests) and then runs the index; `-no-index` skips it.
+- **Incremental.** A repository is read again only when its `pushed_at` changed
+  or it could not be read last time.
+- **Bounded.** A zip over `-max-zip` MiB (default 32) is refused, an archive over
+  20000 entries or declaring over 128 MiB is refused, bytes are counted as read
+  rather than trusted from the header, and zip entry names are only ever read
+  (never written to disk) and refused if they could escape (`..`, absolute, `\`,
+  NUL, control characters). Fuzz tests cover the name and archive readers; bomb
+  tests assert the refusal.
+- **Honest about what it could not read.** Every run prints how many repositories
+  were indexed, how many are not in the proxy (not a module, **private**, or
+  unpublished: the proxy cannot see a private repository, so those are a blind
+  spot, not a NO), how many are **UNREAD** with the reason, and how many were
+  skipped as not Go. A zero result is never printed as `nothing in N
+  repositories` when part of N could not be read.
 
 ## Install
 
