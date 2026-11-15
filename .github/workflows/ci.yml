@@ -67,3 +67,20 @@ jobs:
         run: go vet ./...
       - name: test
         run: go test -race -timeout 5m ./...
+
+  # ⛔ THE ORGANISATION'S LANE, CALLED RATHER THAN COPIED. This repository had
+  # NO vulnerability scan at all until 2026-11-15, when
+  # `gofloor --floor 1.27.4 go-fleettools` reported it as `govulncheck: none` —
+  # one of three such tools in the organisation that BUILDS the instruments
+  # which find exactly that. The definition, and every reason behind its flags
+  # (why govulncheck's exit status is not believed, why vulngate judges the
+  # stream, why the two tools are pinned, and why the scan runs under THIS
+  # repository's go.mod rather than the tools' own floor), lives in one file:
+  # go-fleettools/.github/.github/workflows/vulns.yml
+  #
+  # @main and not a pinned SHA: it is a sibling workflow of the same
+  # organisation, under the same review and branch protection as this file. A
+  # pinned SHA would need one pull request per caller to move, which is how a
+  # single definition quietly becomes N copies again.
+  vulns:
+    uses: go-fleettools/.github/.github/workflows/vulns.yml@main
